@@ -33,9 +33,16 @@ button {
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-button:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+  }
+}
+
+button:active {
+  filter: none;
+  transform: translateY(1px);
 }
 
 button:focus-visible {
@@ -111,9 +118,38 @@ button:focus-visible {
   margin: 0;
 }
 
-.orientation-icon {
-  color: #7ee7d2;
-  font-size: 3rem;
+.orientation-phone {
+  animation: rotate-phone 3.5s ease-in-out infinite;
+  background: #10152b;
+  border: 0.15rem solid #e7ecff;
+  border-radius: 0.5rem;
+  display: block;
+  height: 4.5rem;
+  transform-origin: center;
+  width: 2.5rem;
+}
+
+@keyframes rotate-phone {
+  0%,
+  20% {
+    transform: rotate(0deg);
+  }
+
+  45%,
+  75% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orientation-phone {
+    animation: none;
+    transform: rotate(90deg);
+  }
 }
 
 .name-fields,
