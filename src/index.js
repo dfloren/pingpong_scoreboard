@@ -35,7 +35,6 @@ const elements = {
   setupInputLabel: document.querySelector('#setup-input-label'),
   setupInput: document.querySelector('#setup-input'),
   setupOptions: document.querySelector('#setup-options'),
-  orientationPrompt: document.querySelector('#orientation-prompt'),
   sideDiagram: document.querySelector('#side-diagram'),
   tableTopView: document.querySelector('.table-top-view'),
   sidePlayerOne: document.querySelector('#side-player-one'),
@@ -45,7 +44,6 @@ const elements = {
   sideSwitchButton: document.querySelector('#side-switch-button'),
   serveChoice: document.querySelector('#serve-choice'),
   setupBack: document.querySelector('#setup-back'),
-  setupSkip: document.querySelector('#setup-skip'),
   setupNext: document.querySelector('#setup-next'),
   scoreboard: document.querySelector('#scoreboard'),
   playersContainer: document.querySelector('#players'),
@@ -332,13 +330,8 @@ function showSetupStep() {
     'Game points',
     'Match format'
   ];
-  const mobileDevice = isMobileDevice();
-  if (mobileDevice && setup.step === 0 && isLandscapeOrientation()) {
-    setup.step = 1;
-  }
-  const orientationStep = mobileDevice && setup.step === 0;
-  const configStep = mobileDevice ? setup.step - 1 : setup.step;
-  const setupStepCount = labels.length + (mobileDevice ? 1 : 0);
+  const configStep = setup.step;
+  const setupStepCount = labels.length;
   elements.setupStepLabel.textContent = `Step ${setup.step + 1} of ${setupStepCount}`;
   elements.setupInputLabel.textContent = labels[configStep];
   elements.setupInput.setAttribute('aria-label', labels[configStep]);
@@ -346,20 +339,16 @@ function showSetupStep() {
   elements.setupInput.value = configStep >= 0 && configStep < 2 && setup.visitedPlayers[configStep]
     ? setup.players[configStep]
     : '';
-  elements.setupInput.hidden = orientationStep || configStep > 1;
-  elements.setupInputLabel.hidden = orientationStep;
+  elements.setupInput.hidden = configStep > 1;
+  elements.setupInputLabel.hidden = false;
   elements.setupOptions.hidden = configStep < 3 || configStep > 4;
-  elements.orientationPrompt.hidden = !orientationStep;
   elements.sideDiagram.hidden = configStep !== 2;
   elements.sideSwitchButton.hidden = configStep !== 2;
   elements.serveChoice.hidden = true;
-  elements.setupNext.hidden = orientationStep;
-  elements.setupSkip.hidden = true;
+  elements.setupNext.hidden = false;
   elements.setupBack.hidden = setup.step === 0;
 
-  if (orientationStep) {
-    elements.setupSkip.hidden = false;
-  } else if (configStep === 2) {
+  if (configStep === 2) {
     elements.setupInputLabel.textContent = 'Choose player sides';
     elements.sidePlayerOneName.textContent = setup.players[0];
     elements.sidePlayerTwoName.textContent = setup.players[1];
@@ -381,7 +370,7 @@ function showSetupStep() {
     elements.setupOptions.replaceChildren();
   }
 
-  elements.setupNext.disabled = orientationStep || configStep > 1
+  elements.setupNext.disabled = configStep > 1
     ? (configStep === 2 ? false : !elements.setupOptions.querySelector('[aria-pressed="true"]'))
     : false;
 }
@@ -437,19 +426,7 @@ function showServeSelection() {
   });
 }
 
-function completeOrientationStep() {
-  if (!isMobileDevice() || setup.step !== 0) {
-    return;
-  }
-
-  setup.step = 1;
-  showSetupStep();
-}
-
 function handleOrientationChange() {
-  if (isMobileDevice() && isLandscapeOrientation()) {
-    completeOrientationStep();
-  }
   updateSideDiagramLayout();
 }
 
@@ -505,11 +482,7 @@ function startNewMatch() {
   setup.pointsToWin = 21;
   setup.bestOf = 3;
   history.length = 0;
-  if (isMobileDevice() && isLandscapeOrientation()) {
-    completeOrientationStep();
-  } else {
-    showSetupStep();
-  }
+  showSetupStep();
 }
 
 function undoLastPoint() {
@@ -527,11 +500,7 @@ elements.scores.forEach((score, index) => {
   score.addEventListener('dblclick', (event) => event.preventDefault());
 });
 elements.setupNext.addEventListener('click', () => {
-  if (isMobileDevice() && setup.step === 0) {
-    return;
-  }
-
-  const configStep = isMobileDevice() ? setup.step - 1 : setup.step;
+  const configStep = setup.step;
   const selectedOption = elements.setupOptions.querySelector('[aria-pressed="true"]');
   const value = configStep === 2
     ? 'side-selected'
@@ -553,7 +522,7 @@ elements.setupNext.addEventListener('click', () => {
   }
   setup.step += 1;
   elements.setupInput.value = '';
-  const finalConfigStep = isMobileDevice() ? 6 : 5;
+  const finalConfigStep = 5;
   if (setup.step === finalConfigStep) {
     showServeSelection();
   } else {
@@ -561,7 +530,6 @@ elements.setupNext.addEventListener('click', () => {
   }
 });
 elements.setupBack.addEventListener('click', goToPreviousSetupStep);
-elements.setupSkip.addEventListener('click', completeOrientationStep);
 elements.setupInput.addEventListener('input', () => {
   elements.setupNext.disabled = false;
 });
@@ -577,7 +545,7 @@ elements.setupOptions.addEventListener('click', (event) => {
     return;
   }
 
-  const configStep = isMobileDevice() ? setup.step - 1 : setup.step;
+  const configStep = setup.step;
   elements.setupOptions.querySelectorAll('.setup-option').forEach((button) => {
     button.setAttribute('aria-pressed', String(button === option));
   });
