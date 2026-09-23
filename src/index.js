@@ -333,6 +333,9 @@ function showSetupStep() {
     'Match format'
   ];
   const mobileDevice = isMobileDevice();
+  if (mobileDevice && setup.step === 0 && isLandscapeOrientation()) {
+    setup.step = 1;
+  }
   const orientationStep = mobileDevice && setup.step === 0;
   const configStep = mobileDevice ? setup.step - 1 : setup.step;
   const setupStepCount = labels.length + (mobileDevice ? 1 : 0);
