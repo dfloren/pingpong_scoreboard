@@ -650,7 +650,6 @@ h1 {
 
 .scoreboard-summary {
   margin: 2rem auto 0;
-  max-width: 28rem;
   padding: 0;
   text-align: left;
 }
@@ -754,8 +753,10 @@ h1 {
 }
 
 .player-stats h2 {
+  border-bottom: 1px solid #2d3a63;
   font-size: 1.15rem;
   margin: 0 0 1rem;
+  padding-bottom: 0.75rem;
 }
 
 .player-stats-table {
