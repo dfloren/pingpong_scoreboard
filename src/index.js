@@ -8,9 +8,21 @@ const state = {
   firstServer: 0,
   sides: [0, 1],
   matchOver: false,
-  summaries: []
+  summaries: [],
+  playerStats: [
+    { servePoints: 0, serveWins: 0, currentStreak: 0, longestStreak: 0 },
+    { servePoints: 0, serveWins: 0, currentStreak: 0, longestStreak: 0 }
+  ],
+  lastPointWinner: null
 };
 const history = [];
+
+function createPlayerStats() {
+  return [
+    { servePoints: 0, serveWins: 0, currentStreak: 0, longestStreak: 0 },
+    { servePoints: 0, serveWins: 0, currentStreak: 0, longestStreak: 0 }
+  ];
+}
 
 const setup = {
   step: 0,
@@ -70,6 +82,18 @@ const elements = {
   matchResetControls: document.querySelector('#match-reset-controls'),
   scoreboardSummary: document.querySelector('#scoreboard-summary'),
   scoreboardSummaryList: document.querySelector('#scoreboard-summary-list'),
+  playerStatsNames: [
+    document.querySelector('#player-one-stats-name'),
+    document.querySelector('#player-two-stats-name')
+  ],
+  serveWinRates: [
+    document.querySelector('#player-one-serve-win-rate'),
+    document.querySelector('#player-two-serve-win-rate')
+  ],
+  longestStreaks: [
+    document.querySelector('#player-one-longest-streak'),
+    document.querySelector('#player-two-longest-streak')
+  ],
   resetButton: document.querySelector('#reset-button'),
   newMatchButton: document.querySelector('#new-match-button'),
   backButton: document.querySelector('#back-button'),
@@ -161,6 +185,22 @@ function closeGameSummary() {
   hideGameSummary();
 }
 
+function renderPlayerStats() {
+  elements.playerStatsNames.forEach((element, index) => {
+    element.textContent = state.players[index];
+  });
+  elements.serveWinRates.forEach((element, index) => {
+    const stats = state.playerStats[index];
+    const percentage = stats.servePoints === 0
+      ? 0
+      : Math.round((stats.serveWins / stats.servePoints) * 100);
+    element.textContent = `${percentage}%`;
+  });
+  elements.longestStreaks.forEach((element, index) => {
+    element.textContent = state.playerStats[index].longestStreak;
+  });
+}
+
 function continueToNextGame() {
   if (state.matchOver || getGameWinner() === null) {
     return;
@@ -233,6 +273,7 @@ function render() {
     element.classList.toggle('active', index === servingPlayer && !state.matchOver);
     element.setAttribute('aria-hidden', index !== servingPlayer || state.matchOver);
   });
+  renderPlayerStats();
   elements.backButton.disabled = history.length === 0;
   elements.serveSwitchButton.disabled = state.matchOver;
   updateScoreboardSummary();
@@ -271,6 +312,8 @@ function saveState() {
     firstServer: state.firstServer,
     sides: [...state.sides],
     matchOver: state.matchOver,
+    playerStats: state.playerStats.map((stats) => ({ ...stats })),
+    lastPointWinner: state.lastPointWinner,
     summaries: state.summaries.map((summary) => ({
       number: summary.number,
       scores: [...summary.scores],
@@ -285,7 +328,26 @@ function awardPoint(playerIndex) {
   }
 
   saveState();
+  const servingPlayer = getServingPlayer();
   state.scores[playerIndex] += 1;
+  const serverStats = state.playerStats[servingPlayer];
+  const winnerStats = state.playerStats[playerIndex];
+  serverStats.servePoints += 1;
+  if (servingPlayer === playerIndex) {
+    serverStats.serveWins += 1;
+  }
+  state.playerStats.forEach((playerStats, index) => {
+    if (index !== playerIndex) {
+      playerStats.currentStreak = 0;
+    }
+  });
+  if (state.lastPointWinner === playerIndex) {
+    winnerStats.currentStreak += 1;
+  } else {
+    winnerStats.currentStreak = 1;
+  }
+  winnerStats.longestStreak = Math.max(winnerStats.longestStreak, winnerStats.currentStreak);
+  state.lastPointWinner = playerIndex;
   const winner = getGameWinner();
 
   if (winner !== null) {
@@ -402,8 +464,10 @@ function goToPreviousSetupStep() {
 }
 
 function showServeSelection() {
+  state.players = [...setup.players];
   elements.setupPage.hidden = true;
   elements.scoreboard.hidden = false;
+  renderPlayerStats();
   elements.playersContainer.hidden = true;
   elements.serveSelection.hidden = false;
   elements.gameStatus.hidden = true;
@@ -446,6 +510,8 @@ function startMatch(firstServer) {
   state.sides = [setup.playerOneSide, setup.playerOneSide === 0 ? 1 : 0];
   state.matchOver = false;
   state.summaries = [];
+  state.playerStats = createPlayerStats();
+  state.lastPointWinner = null;
   elements.playersContainer.hidden = false;
   elements.serveSelection.hidden = true;
   elements.gameStatus.hidden = false;
@@ -466,7 +532,10 @@ function resetMatch() {
   state.sides = [setup.playerOneSide, setup.playerOneSide === 0 ? 1 : 0];
   state.matchOver = false;
   state.summaries = [];
+  state.playerStats = createPlayerStats();
+  state.lastPointWinner = null;
   history.length = 0;
+  renderPlayerStats();
   hideGameSummary();
   showServeSelection();
 }
@@ -481,7 +550,10 @@ function startNewMatch() {
   setup.playerOneSide = 0;
   setup.pointsToWin = 21;
   setup.bestOf = 3;
+  state.playerStats = createPlayerStats();
+  state.lastPointWinner = null;
   history.length = 0;
+  renderPlayerStats();
   showSetupStep();
 }
 

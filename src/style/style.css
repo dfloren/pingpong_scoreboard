@@ -743,6 +743,51 @@ h1 {
   padding: 0.9rem 1rem;
 }
 
+.player-stats {
+  background: #1a2342;
+  border: 1px solid #2d3a63;
+  border-radius: 0.8rem;
+  margin: 2rem auto 0;
+  max-width: 42rem;
+  padding: 1.25rem;
+  text-align: left;
+}
+
+.player-stats h2 {
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+}
+
+.player-stats-table {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.player-stats-row {
+  align-items: center;
+  background: #10152b;
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(8rem, 1.5fr) repeat(2, minmax(4rem, 1fr));
+  padding: 0.7rem 0.85rem;
+}
+
+.player-stats-header {
+  background: transparent;
+  color: #7ee7d2;
+  font-weight: 700;
+  padding-bottom: 0.25rem;
+}
+
+.player-stats-row > :not(:first-child) {
+  text-align: center;
+}
+
+.scoreboard-summary {
+  margin-top: 2rem;
+}
+
 .back-button {
   background: #f8d477;
   align-items: center;

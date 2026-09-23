@@ -127,14 +127,33 @@
         </div>
       </div>
 
-      <div class="match-reset-controls" id="match-reset-controls">
-        <button type="button" class="reset-button" id="reset-button">Reset match</button>
-        <button type="button" class="new-match-button" id="new-match-button">New match</button>
-      </div>
-
-      <section class="scoreboard-summary" id="scoreboard-summary" aria-labelledby="scoreboard-summary-title">
-        <h2 id="scoreboard-summary-title">Game summary</h2>
-        <div id="scoreboard-summary-list" class="game-summary-list"></div>
+      <section class="player-stats" id="player-stats" aria-labelledby="player-stats-title">
+        <h2 id="player-stats-title">Player stats</h2>
+        <div class="player-stats-table" role="table" aria-label="Player statistics comparison">
+          <div class="player-stats-row player-stats-header" role="row">
+            <span role="columnheader">Stat</span>
+            <span id="player-one-stats-name" role="columnheader">Player 1</span>
+            <span id="player-two-stats-name" role="columnheader">Player 2</span>
+          </div>
+          <div class="player-stats-row" role="row">
+            <span role="rowheader">Points won on serve</span>
+            <span id="player-one-serve-win-rate" role="cell">0%</span>
+            <span id="player-two-serve-win-rate" role="cell">0%</span>
+          </div>
+          <div class="player-stats-row" role="row">
+            <span role="rowheader">Longest point streak</span>
+            <span id="player-one-longest-streak" role="cell">0</span>
+            <span id="player-two-longest-streak" role="cell">0</span>
+          </div>
+        </div>
+        <section class="scoreboard-summary" id="scoreboard-summary" aria-labelledby="scoreboard-summary-title">
+          <h2 id="scoreboard-summary-title">Game summary</h2>
+          <div id="scoreboard-summary-list" class="game-summary-list"></div>
+        </section>
+        <div class="match-reset-controls" id="match-reset-controls">
+          <button type="button" class="reset-button" id="reset-button">Reset match</button>
+          <button type="button" class="new-match-button" id="new-match-button">New match</button>
+        </div>
       </section>
     </main>
 
