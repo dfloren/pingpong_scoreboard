@@ -136,7 +136,56 @@ function hideGameSummary() {
   elements.gameSummaryOverlay.hidden = true;
 }
 
-function renderSummaryList(listElement) {
+function renderScoreboardSummaryList(listElement) {
+  const table = document.createElement('table');
+  table.className = 'set-summary-table';
+
+  const hasStartedMatch = state.summaries.length > 0 || state.matchOver ||
+    state.scores.some((score) => score > 0) || state.sets.some((set) => set > 0);
+  const players = hasStartedMatch ? state.players : setup.players;
+  const setCount = Math.max(1, Number(state.bestOf || setup.bestOf || 3));
+  const setHeaders = Array.from({ length: setCount }, (_, index) => index + 1);
+
+  const headerRow = document.createElement('tr');
+  const cornerHeader = document.createElement('th');
+  cornerHeader.setAttribute('aria-hidden', 'true');
+  headerRow.append(cornerHeader);
+
+  setHeaders.forEach((setNumber) => {
+    const headerCell = document.createElement('th');
+    headerCell.className = 'set-summary-header';
+    headerCell.textContent = `Set ${setNumber}`;
+    headerRow.append(headerCell);
+  });
+
+  table.append(headerRow);
+
+  players.forEach((player, playerIndex) => {
+    const row = document.createElement('tr');
+    const playerCell = document.createElement('th');
+    playerCell.scope = 'row';
+    playerCell.textContent = player;
+    row.append(playerCell);
+
+    setHeaders.forEach((setNumber) => {
+      const summary = state.summaries.find((item) => item.number === setNumber);
+      const scoreCell = document.createElement('td');
+      scoreCell.textContent = summary ? summary.scores[playerIndex] : '';
+
+      if (summary && summary.winner === playerIndex) {
+        scoreCell.classList.add('summary-winner');
+      }
+
+      row.append(scoreCell);
+    });
+
+    table.append(row);
+  });
+
+  listElement.replaceChildren(table);
+}
+
+function renderGameSummaryList(listElement) {
   listElement.replaceChildren(...state.summaries.map((summary) => {
     const summaryElement = document.createElement('p');
     summaryElement.className = 'set-summary';
@@ -148,7 +197,7 @@ function renderSummaryList(listElement) {
 }
 
 function updateScoreboardSummary() {
-  renderSummaryList(elements.scoreboardSummaryList);
+  renderScoreboardSummaryList(elements.scoreboardSummaryList);
 }
 
 function showGameSummary() {
@@ -169,7 +218,7 @@ function showGameSummary() {
       `${state.players[latest.winner]} wins the game`;
   }
 
-  renderSummaryList(elements.gameSummaryList);
+  renderGameSummaryList(elements.gameSummaryList);
   elements.gameSummaryClose.hidden = !state.matchOver;
   elements.gameSummaryContinue.hidden = state.matchOver;
   elements.gameSummaryReset.hidden = !state.matchOver;
@@ -465,9 +514,11 @@ function goToPreviousSetupStep() {
 
 function showServeSelection() {
   state.players = [...setup.players];
+  state.bestOf = setup.bestOf;
   elements.setupPage.hidden = true;
   elements.scoreboard.hidden = false;
   renderPlayerStats();
+  updateScoreboardSummary();
   elements.playersContainer.hidden = true;
   elements.serveSelection.hidden = false;
   elements.gameStatus.hidden = true;
@@ -525,6 +576,7 @@ function startMatch(firstServer) {
 }
 
 function resetMatch() {
+  state.players = [...setup.players];
   state.scores = [0, 0];
   state.sets = [0, 0];
   state.gameNumber = 1;
@@ -536,6 +588,7 @@ function resetMatch() {
   state.lastPointWinner = null;
   history.length = 0;
   renderPlayerStats();
+  updateScoreboardSummary();
   hideGameSummary();
   showServeSelection();
 }
@@ -550,10 +603,14 @@ function startNewMatch() {
   setup.playerOneSide = 0;
   setup.pointsToWin = 21;
   setup.bestOf = 3;
+  state.players = [...setup.players];
+  state.bestOf = setup.bestOf;
   state.playerStats = createPlayerStats();
   state.lastPointWinner = null;
+  state.summaries = [];
   history.length = 0;
   renderPlayerStats();
+  updateScoreboardSummary();
   showSetupStep();
 }
 
@@ -641,4 +698,6 @@ elements.gameSummaryContinue.addEventListener('click', continueToNextGame);
 elements.backButton.addEventListener('click', undoLastPoint);
 elements.serveSwitchButton.addEventListener('click', switchFirstServer);
 
+state.players = [...setup.players];
 showSetupStep();
+updateScoreboardSummary();

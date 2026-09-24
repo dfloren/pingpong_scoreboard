@@ -725,6 +725,80 @@ h1 {
   gap: 0.75rem;
 }
 
+.set-summary-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.set-summary-table > tr:first-child > th {
+  background: transparent;
+  border: none;
+  color: #aab5d6;
+  font-weight: 400;
+  padding: 0.5rem 0.25rem 0.8rem;
+  text-align: center;
+}
+
+.set-summary-table > tr:first-child > th,
+.set-summary-table > tr:first-child > th * {
+  font-weight: 400;
+}
+
+.set-summary-table .set-summary-header {
+  color: #ffffff;
+  font-weight: 400;
+}
+
+.set-summary-table > tr:first-child > .set-summary-header {
+  color: #ffffff;
+}
+
+.set-summary-table > tr:not(:first-child) > th,
+.set-summary-table > tr:not(:first-child) > td {
+  background: transparent;
+  border: none;
+  color: #aab5d6;
+  padding: 0.8rem 0.75rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.set-summary-table > tr:not(:first-child) > td {
+  color: #ffffff;
+}
+
+.set-summary-table.set-summary-table > tr:not(:first-child) > td.summary-winner {
+  color: #d93636;
+}
+
+.set-summary-table > tr:nth-child(2) > th,
+.set-summary-table > tr:nth-child(2) > td,
+.set-summary-table > tr:nth-child(3) > th,
+.set-summary-table > tr:nth-child(3) > td {
+  background: #1a2342;
+}
+
+.set-summary-table > tr:not(:first-child) > th[scope='row'] {
+  color: #7ee7d2;
+  font-weight: 700;
+  text-align: left;
+}
+
+.set-summary-table.set-summary-table > tr > :nth-child(n + 3) {
+  border-left: 1px solid #2d3a63;
+}
+
+.set-summary-table th:first-child {
+  text-align: left;
+}
+
+.summary-winner {
+  color: #d93636;
+  font-weight: 700;
+}
+
 .game-summary-dialog .start-button {
   justify-self: stretch;
 }
